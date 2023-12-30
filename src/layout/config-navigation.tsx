@@ -1,3 +1,5 @@
+import * as FlatColor from "react-icons/fc";
+
 export interface NavElement {
   title: string;
   elements: {
@@ -10,12 +12,12 @@ export interface NavElement {
 
 export const navConfig: NavElement[] = [
   {
-    title: "",
+    title: "Department",
     elements: [
       {
-        title: "",
+        title: "Need Approval",
         path: "",
-        icon: null,
+        icon: <FlatColor.FcSettings />,
         onItemClick: () => {},
       },
     ],

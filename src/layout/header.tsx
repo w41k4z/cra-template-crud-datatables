@@ -11,12 +11,18 @@ const Header = () => {
   };
 
   return (
-    <header className="head-nav sticky-top px-md-5 px-sm-2 d-flex justify-content-between align-items-center">
-      <div className="search-bar d-flex align-items-center w-25">
-        <input className="border-less" type="search" placeholder="Search..." />
-        <span style={{ fontSize: "25px", color: "white" }} className="ms-2">
-          <BsSearch />
-        </span>
+    <header className="nav navbar navbar-dark bg-dark sticky-top px-5 px-sm-2 d-flex justify-content-end align-items-center">
+      <div className="d-none d-md-block me-5">
+        <div className="input-group">
+          <input
+            type="search"
+            className="form-control"
+            placeholder="Search..."
+          />
+          <button className="btn btn-primary input-group-prepend">
+            <BsSearch />
+          </button>
+        </div>
       </div>
       <div className="profile">
         <button

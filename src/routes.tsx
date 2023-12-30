@@ -1,12 +1,13 @@
 import { lazy, Suspense } from "react";
 import { Outlet, Navigate, useRoutes } from "react-router-dom";
-import Layout from "./layout";
+import Layout from "./Layout";
 
 export const Page404 = lazy(() => import("./pages/Page404"));
 
 export default function Router() {
   const routes = useRoutes([
     {
+      path: "/",
       element: (
         <Layout>
           <Suspense>

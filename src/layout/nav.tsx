@@ -14,16 +14,16 @@ const Nav = ({ header, currentPageIndex, className, ...rest }: NavProps) => {
 
   return (
     <nav className={`side-panel ${className}`} {...rest}>
-      {header}
+      <span className="d-none d-md-block">{header}</span>
       <hr />
-      <ul className="nav nav-pills flex-column mb-auto">
+      <ul className="nav nav-pills flex-column align-sm-items-center mb-auto">
         {navConfig.map((navItem, index1) => {
           return (
             <>
               <li
                 className={"menu-title my-2 d-none d-md-block"}
                 key={`section-${index1}`}
-                style={{ fontWeight: "bold", fontSize: "1.2rem" }}
+                style={{ fontWeight: "bold", fontSize: "0.9rem" }}
               >
                 {navItem.title}
               </li>
@@ -41,7 +41,7 @@ const Nav = ({ header, currentPageIndex, className, ...rest }: NavProps) => {
                       className={
                         activeItemIndex === index1 + index2
                           ? "nav-link active d-flex align-items-center"
-                          : "nav-link text-dark d-flex align-items-center"
+                          : "nav-link default text-dark d-flex align-items-center"
                       }
                       to={element.path}
                     >

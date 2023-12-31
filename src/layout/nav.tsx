@@ -9,7 +9,12 @@ interface NavProps extends HTMLProps<HTMLElement> {
   currentPageIndex?: number;
 }
 
-const Nav = ({ header, currentPageIndex, className, ...rest }: NavProps) => {
+const Nav = ({
+  header,
+  currentPageIndex,
+  className = "",
+  ...rest
+}: NavProps) => {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
 
   return (

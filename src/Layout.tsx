@@ -1,9 +1,9 @@
 import Header from "./layout/header";
 import Nav from "./layout/nav";
 
-interface LayoutProps {
+type LayoutProps = {
   children: React.ReactNode;
-}
+};
 
 const header = <h4>Start Bootstrap</h4>;
 

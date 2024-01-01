@@ -1,13 +1,14 @@
+import React from "react";
 import { HTMLProps, ReactNode, useState } from "react";
 import { navConfig } from "./config-navigation";
 import { Link } from "react-router-dom";
 
 import "../assets/css/nav.css";
 
-interface NavProps extends HTMLProps<HTMLElement> {
+type NavProps = HTMLProps<HTMLElement> & {
   header: ReactNode;
   currentPageIndex?: number;
-}
+};
 
 const Nav = ({
   header,
@@ -24,10 +25,9 @@ const Nav = ({
       <ul className="nav nav-pills flex-column align-sm-items-center mb-auto">
         {navConfig.map((navItem, index1) => {
           return (
-            <>
+            <React.Fragment key={`section-${index1}`}>
               <li
                 className={"menu-title my-2 d-none d-md-block"}
-                key={`section-${index1}`}
                 style={{ fontWeight: "bold", fontSize: "0.9rem" }}
               >
                 {navItem.title}
@@ -63,7 +63,7 @@ const Nav = ({
                   </li>
                 );
               })}
-            </>
+            </React.Fragment>
           );
         })}
       </ul>

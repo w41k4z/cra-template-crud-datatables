@@ -1,444 +1,225 @@
-/* MODULES */
-import { ReactNode, useEffect, useState } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { useEffect, useState } from "react";
 
-/* COMPONENT */
 import { BiPlus } from "react-icons/bi";
-import { AiOutlineClose } from "react-icons/ai";
-import { BsDownload, BsUpload, BsFilter } from "react-icons/bs";
-import { TableColumn } from "./TableColumn";
-import { Modal } from "react-bootstrap";
+import { FaTable } from "react-icons/fa";
+import { Column } from "./column";
 import TableRow from "./TableRow";
 
-interface BasicCRUDTableProps {
+import { filterData } from "./filter";
+import TableHeader from "./TableHeader";
+
+import "./datatable.css";
+import { set } from "react-hook-form";
+
+interface GenericTableProps {
   title?: string;
-  columns: TableColumn[];
+  columns: Column[];
   data: any[];
-  dataPropIDName: string;
   indexedRow?: boolean;
-  hasImportCsv?: boolean;
-  hasExportPdf?: boolean;
   hasAction?: boolean;
-  addModalFormInputs: { input: ReactNode; label: ReactNode }[];
-  onAdd: () => void;
-  onUpdate: (row: any) => void;
-  onDelete: (row: any) => void;
-  updateModalFormInputs: (
-    row: any
-  ) => { input: ReactNode; label?: ReactNode }[];
-  uploadCall: (file: File) => void;
+  itemsPerPage?: string[];
 }
 
-const BasicCRUDTable = ({
+const GenericTable = ({
   title,
   columns,
   data,
-  dataPropIDName,
   indexedRow = false,
-  hasImportCsv = false,
-  hasExportPdf = false,
-  hasAction = true,
-  addModalFormInputs,
-  onAdd,
-  onUpdate,
-  onDelete,
-  updateModalFormInputs,
-  uploadCall,
-}: BasicCRUDTableProps) => {
-  /* HOOOKS */
+  hasAction = false,
+  itemsPerPage = ["5", "10", "15", "*"],
+}: GenericTableProps) => {
+  console.log("Rendering...");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPageValue, setItemsPerPageValue] = useState(itemsPerPage[0]);
   const [filters, setFilters] = useState<{ [key: string]: string[] }>();
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>(data);
   useEffect(() => {
     const arrFilters: { [key: string]: string[] } = {};
     for (const column of columns) {
       arrFilters[column.propTarget] = [""];
     }
     setFilters(arrFilters);
-    setFilteredData(data);
-  }, [columns, data]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
-    filterData();
+    if (filters) {
+      filterData(data, columns, filters, setFilteredData);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
-  const [addModalVisibility, setAddModalVisibility] = useState(false);
-  const [importModalVisibility, setImportModalVisibility] = useState(false);
-  const [uploadingFile, setUploadingFile] = useState<File>();
+  const itemsCount = filteredData.length;
+  const pagesCount = Math.ceil(itemsCount / parseInt(itemsPerPageValue));
+  const itemsPerPageNumberValue =
+    itemsPerPageValue === "*" ? itemsCount : parseInt(itemsPerPageValue);
+  const start = (currentPage - 1) * itemsPerPageNumberValue;
+  const end = currentPage * itemsPerPageNumberValue;
+  const paginatedData = filteredData.slice(start, end);
 
-  /* STYLES */
-  const filterContainerStyle = {
-    height: "30px",
-    width: "fit-content",
-    borderBottom: "1px outset",
-    paddingBottom: "5px",
-    display: "flex",
-    alignItems: "center",
+  const navigate = (page: number) => {
+    page = page > pagesCount ? 1 : page;
+    page = page < 1 ? pagesCount : page;
+    setCurrentPage(page);
   };
-  const filterStyle = {
-    outline: "none",
-    border: "unset",
-  };
-
-  /* LOGIC */
-  const showAddModal = () => setAddModalVisibility(true);
-  const hideAddModal = () => setAddModalVisibility(false);
-  const showImportModal = () => setImportModalVisibility(true);
-  const hideImportModal = () => setImportModalVisibility(false);
-
-  const filterData = () => {
-    let filteredData = data;
-    for (const column of columns) {
-      filteredData = filteredData.filter((item) => {
-        if (column.format === "number" || column.format === "currency") {
-          let lowerValue: number =
-            filters && filters[column.propTarget][0]
-              ? parseFloat(filters[column.propTarget][0])
-              : Number.MIN_VALUE;
-          let upperValue: number =
-            filters && filters[column.propTarget][1]
-              ? parseFloat(filters[column.propTarget][1])
-              : Number.MAX_VALUE;
-          if (
-            lowerValue <= item[column.propTarget] &&
-            item[column.propTarget] <= upperValue
-          ) {
-            return item[column.propTarget];
-          }
-          return null;
-        } else {
-          return item[column.propTarget]
-            .toString()
-            .toLowerCase()
-            .includes(
-              filters ? filters[column.propTarget][0].toLowerCase() : ""
-            );
-        }
-      });
-    }
-    setFilteredData(filteredData);
-  };
-  const handleFilter = (filter: string, value: string) => {
-    const arrFilter = { ...filters };
-    arrFilter[filter][0] = value;
-    setFilters({ ...arrFilter });
-  };
-  const handleUpperNumberFilter = (filter: string, value: string) => {
-    const arrFilter = { ...filters };
-    arrFilter[filter][1] = value;
-    setFilters({ ...arrFilter });
-  };
-  const clearFilter = (filter: string) => {
-    const arrFilter = { ...filters };
-    arrFilter[filter][0] = "";
-    setFilters({ ...arrFilter });
-  };
-  const clearUpperNumberFilter = (filter: string) => {
-    const arrFilter = { ...filters };
-    arrFilter[filter][1] = "";
-    setFilters({ ...arrFilter });
-  };
-
-  const uploadFile = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    event.preventDefault();
-    uploadingFile && uploadCall(uploadingFile);
-  };
-
-  const exportPDF = () => {
-    const unit = "pt";
-    const size = "A4"; // Use A1, A2, A3 or A4
-    const orientation = "portrait"; // portrait or landscape
-
-    const marginLeft = 40;
-    const doc = new jsPDF(orientation, unit, size);
-
-    doc.setFontSize(15);
-
-    const docTitle = title ? title : "Report";
-    const headers = [columns.map((column) => column.name)];
-
-    const data = filteredData.map((data) =>
-      columns.map((column) => data[column.propTarget])
-    );
-
-    let content = {
-      startY: 50,
-      head: headers,
-      body: data,
-    };
-
-    doc.text(docTitle, marginLeft, 40);
-    autoTable(doc, content);
-    doc.save(`${docTitle}.pdf`);
-  };
-
-  /* ELEMENT */
-  const addModal = (
-    <Modal show onHide={hideAddModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Add new {title && title.toLowerCase()}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <form>
-          {addModalFormInputs.map((input, index) => (
-            <div className="mb-3" key={index}>
-              {input.label}
-              {input.input}
-            </div>
-          ))}
-          <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-primary"
-              onClick={(event) => {
-                event.preventDefault();
-                onAdd();
-                setAddModalVisibility(false);
-              }}
-            >
-              Add
-            </button>
-          </div>
-        </form>
-      </Modal.Body>
-    </Modal>
-  );
-  const importModal = (
-    <Modal show onHide={hideImportModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Import csv</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <form encType="multipart/form-data" method="POST">
-          <div className="mb-3">
-            <label htmlFor="csvFile" className="form-label">
-              Select csv file
-            </label>
-            <input
-              type="file"
-              className="form-control"
-              id="csvFile"
-              accept=".csv"
-              required
-              onChange={(event) => {
-                if (event.target.files) {
-                  setUploadingFile(event.target.files[0]);
-                }
-              }}
-            />
-          </div>
-          <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-primary"
-              onClick={async (event) => {
-                await uploadFile(event);
-                setImportModalVisibility(false);
-              }}
-            >
-              Import
-            </button>
-          </div>
-        </form>
-      </Modal.Body>
-    </Modal>
-  );
 
   return (
-    <div className="m-4 bg-white">
-      <div className="d-flex flex-column flex-md-row justify-content-md-between p-3">
-        <h3>{title}</h3>
-        <div
-          className="d-flex align-items-center mt-sm-3 mt-md-0"
-          style={{ height: "fit-content" }}
-        >
-          <div className="action d-flex">
-            {hasImportCsv && (
-              <>
-                <button
-                  className="btn btn-outline-success d-flex align-items-center me-2"
-                  onClick={showImportModal}
-                >
-                  <BsUpload style={{ fontSize: "20px" }} className="me-2" />
-                  Import csv
-                </button>
-                {importModalVisibility && importModal}
-              </>
-            )}
-            {hasExportPdf && (
-              <button
-                className="btn btn-outline-dark d-flex align-items-center"
-                onClick={exportPDF}
-              >
-                <BsDownload style={{ fontSize: "20px" }} className="me-2" />{" "}
-                Export pdf
-              </button>
-            )}
+    <div className="card">
+      <div className="card-header d-flex align-items-center">
+        <FaTable style={{ fontSize: "20px" }} />
+        <span className="ms-2">{title}</span>
+      </div>
+      <div className="card-body bg-white">
+        <div className="datatable-top mt-sm-3 mt-md-0 mb-2">
+          <div>
+            <select
+              className="form-select-sm me-2"
+              onChange={(e) => {
+                setItemsPerPageValue(e.target.value);
+              }}
+            >
+              {itemsPerPage.map((item, index) => (
+                <option key={"items-per-page-" + index}>{item}</option>
+              ))}
+            </select>
+            entries per page
           </div>
           {hasAction && (
-            <button
-              className="mx-1 btn btn-outline-primary"
-              onClick={showAddModal}
-            >
+            <button className="mx-1 btn btn-outline-primary">
               <BiPlus style={{ fontSize: "20px" }} />
             </button>
           )}
-          {addModalVisibility && addModal}
         </div>
-      </div>
 
-      <div className="table-responsive">
-        <table className="table table-striped">
-          <thead className="px-2 table-bordered table-dark">
-            <tr
-              style={{
-                color: "#000",
-                fontSize: "1rem",
-                fontWeight: "bold",
-                borderBottom: "1px solid #959090",
-              }}
-              className="text-white"
-            >
-              {indexedRow && (
-                <th scope="col">
-                  <div>#.</div>
-                </th>
+        <div className="table-responsive">
+          <table className="table table-striped">
+            <TableHeader
+              indexedRow={indexedRow}
+              hasAction={hasAction}
+              columns={columns}
+              filters={filters}
+              setFilters={setFilters}
+            />
+            <tbody className="px-2">
+              {filteredData.length === 0 && (
+                <tr>
+                  {indexedRow && <td>0</td>}
+                  {columns.map((column, index) => {
+                    return (
+                      <td
+                        key={"table-row-null-" + index}
+                        style={{
+                          fontStyle: "italic",
+                        }}
+                      >
+                        null
+                      </td>
+                    );
+                  })}
+                </tr>
               )}
-              {columns.map((column, index) => {
-                return (
-                  <th scope="col" key={"table-header-" + index}>
-                    <div>{column.name}</div>
-                    {column.format === "default" && (
-                      <>
-                        <div style={filterContainerStyle}>
-                          <BsFilter
-                            className="me-1 d-none d-md-block"
-                            style={{ fontSize: "23px" }}
-                          />
-                          <input
-                            className="bg-dark text-white"
-                            style={filterStyle}
-                            placeholder={"Filter by '" + column.name + "'"}
-                            type="text"
-                            value={filters ? filters[column.propTarget][0] : ""}
-                            onChange={(event) => {
-                              handleFilter(
-                                column.propTarget,
-                                event.target.value
-                              );
-                            }}
-                          />
-                          <AiOutlineClose
-                            onClick={() => {
-                              clearFilter(column.propTarget);
-                            }}
-                          />
-                        </div>
-                      </>
-                    )}
-                    {(column.format === "number" ||
-                      column.format === "currency") && (
-                      <div className="d-flex">
-                        <div style={filterContainerStyle}>
-                          <BsFilter
-                            className="me-1 d-none d-md-block"
-                            style={{ fontSize: "23px" }}
-                          />
-                          <input
-                            className="bg-dark text-white"
-                            style={{
-                              outline: "none",
-                              border: "unset",
-                              width: "65px",
-                            }}
-                            placeholder={"Min"}
-                            type="text"
-                            value={filters ? filters[column.propTarget][0] : ""}
-                            onChange={(event) => {
-                              handleFilter(
-                                column.propTarget,
-                                event.target.value
-                              );
-                            }}
-                          />
-                          <AiOutlineClose
-                            onClick={() => {
-                              clearFilter(column.propTarget);
-                            }}
-                          />
-                        </div>
-                        <div className="ms-2" style={filterContainerStyle}>
-                          <input
-                            className="bg-dark text-white"
-                            style={{
-                              outline: "none",
-                              border: "unset",
-                              width: "85px",
-                            }}
-                            placeholder={"Max"}
-                            type="text"
-                            value={filters ? filters[column.propTarget][1] : ""}
-                            onChange={(event) => {
-                              handleUpperNumberFilter(
-                                column.propTarget,
-                                event.target.value
-                              );
-                            }}
-                          />
-                          <AiOutlineClose
-                            onClick={() => {
-                              clearUpperNumberFilter(column.propTarget);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </th>
-                );
-              })}
-              {hasAction && (
-                <th scope="col" className="text-center">
-                  <div></div> <div style={{ height: "30px" }}></div>
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className="px-2">
-            {filteredData.length === 0 && (
-              <tr>
-                {indexedRow && <td>0</td>}
-                {columns.map((column, index) => {
-                  return (
-                    <td
-                      key={"table-row-null-" + index}
-                      style={{
-                        fontStyle: "italic",
-                      }}
+              {paginatedData.map((data, index) => (
+                <TableRow
+                  key={"Table-row-" + index}
+                  columns={columns}
+                  data={data}
+                  hasAction={hasAction}
+                  indexedRow={indexedRow}
+                  index={start + index + 1}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="datatable-bottom">
+          <p>Showing 1 to 6 of 6 entries</p>
+          {pagesCount > 1 && (
+            <nav aria-label="Page navigation">
+              <ul className="pagination">
+                <li
+                  className="page-item page-link"
+                  onClick={() => {
+                    navigate(currentPage - 1);
+                  }}
+                >
+                  Previous
+                </li>
+                {pagesCount > 8 && (
+                  <>
+                    <li
+                      className={
+                        "page-item page-link" +
+                        (currentPage === 1 ? " active" : "")
+                      }
+                      onClick={() => navigate(1)}
                     >
-                      null
-                    </td>
-                  );
-                })}
-              </tr>
-            )}
-            {filteredData.map((data, index) => (
-              <TableRow
-                key={"Table-row-" + index}
-                columns={columns}
-                data={data}
-                hasAction={hasAction}
-                dataPropIDName={dataPropIDName}
-                indexedRow={indexedRow}
-                index={index + 1}
-                updateModalFormInputs={updateModalFormInputs(data)}
-                onUpdate={onUpdate}
-                onDelete={onDelete}
-              />
-            ))}
-          </tbody>
-        </table>
+                      1
+                    </li>
+                    <li
+                      className={
+                        "page-item page-link" +
+                        (currentPage === 2 ? " active" : "")
+                      }
+                      onClick={() => navigate(2)}
+                    >
+                      2
+                    </li>
+                    {(currentPage < 3 || currentPage > pagesCount - 2) && (
+                      <li className="page-item page-link">...</li>
+                    )}
+                    {currentPage >= 3 && currentPage <= pagesCount - 2 && (
+                      <li className="page-item active page-link">
+                        {currentPage}
+                      </li>
+                    )}
+                    <li
+                      className={
+                        "page-item page-link" +
+                        (currentPage === pagesCount - 1 ? " active" : "")
+                      }
+                      onClick={() => navigate(pagesCount - 1)}
+                    >
+                      {pagesCount - 1}
+                    </li>
+                    <li
+                      className={
+                        "page-item page-link" +
+                        (currentPage === pagesCount ? " active" : "")
+                      }
+                      onClick={() => navigate(pagesCount)}
+                    >
+                      {pagesCount}
+                    </li>
+                  </>
+                )}
+                {pagesCount <= 8 && (
+                  <>
+                    {Array.from(Array(pagesCount).keys()).map((page, index) => (
+                      <li
+                        key={"page-item-" + index}
+                        className={
+                          "page-item page-link" +
+                          (currentPage === page + 1 ? " active" : "")
+                        }
+                        onClick={() => navigate(page + 1)}
+                      >
+                        {page + 1}
+                      </li>
+                    ))}
+                  </>
+                )}
+                <li
+                  className="page-item page-link"
+                  onClick={() => navigate(currentPage + 1)}
+                >
+                  Next
+                </li>
+              </ul>
+            </nav>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default BasicCRUDTable;
+export default GenericTable;

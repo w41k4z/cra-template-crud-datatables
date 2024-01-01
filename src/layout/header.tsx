@@ -11,7 +11,7 @@ const Header = () => {
   };
 
   return (
-    <header className="nav navbar navbar-dark bg-dark sticky-top px-5 px-sm-2 d-flex justify-content-end align-items-center">
+    <header className="nav navbar navbar-dark bg-dark px-5 px-sm-2 d-flex justify-content-end align-items-center">
       <div className="d-none d-md-block me-5">
         <div className="input-group">
           <input

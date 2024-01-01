@@ -9,7 +9,6 @@ import { filterData } from "./filter";
 import TableHeader from "./TableHeader";
 
 import "./datatable.css";
-import { set } from "react-hook-form";
 
 interface GenericTableProps {
   title?: string;
@@ -131,7 +130,10 @@ const GenericTable = ({
         </div>
 
         <div className="datatable-bottom">
-          <p>Showing 1 to 6 of 6 entries</p>
+          <p>
+            Showing {start + 1} to {paginatedData.length} of {itemsCount}{" "}
+            entries
+          </p>
           {pagesCount > 1 && (
             <nav aria-label="Page navigation">
               <ul className="pagination">

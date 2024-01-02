@@ -9,7 +9,7 @@ export type FormField = Omit<
   "type" | "name"
 > & {
   type: string; // All input types + textarea and select option
-  name: string;
+  name: string; // property name
   label?: string;
   options?: RegisterOptions<FieldValues, string> | undefined; // For react-hook-form
   selectValues?: [string, string][]; // For select input only, array of [value, label]

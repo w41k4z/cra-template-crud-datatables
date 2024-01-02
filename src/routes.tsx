@@ -3,7 +3,7 @@ import { Outlet, Navigate, useRoutes } from "react-router-dom";
 import Layout from "./Layout";
 
 export const Page404 = lazy(() => import("./pages/Page404"));
-export const TestPage = lazy(() => import("./pages/Test"));
+export const ExamplePage = lazy(() => import("./pages/Example"));
 
 export default function Router() {
   const routes = useRoutes([
@@ -18,8 +18,8 @@ export default function Router() {
       ),
       children: [
         {
-          path: "test",
-          element: <TestPage />,
+          path: "example",
+          element: <ExamplePage />,
         },
       ],
     },

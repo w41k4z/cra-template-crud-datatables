@@ -77,7 +77,7 @@ const GenericForm = ({
 
   return (
     <section className="text-black">
-      <div className="card px-2">
+      <div className="card px-2" style={{ paddingBottom: "10px" }}>
         <header className="card-body">
           <h4 className="card-title m-0">{title}</h4>
           <hr />
@@ -85,10 +85,12 @@ const GenericForm = ({
         <main className="card mb-1">
           <form
             onSubmit={handleSubmit(handleFormSubmit)}
-            className="row g-3 px-3"
+            className="row g-3 px-3 pt-3"
           >
             {fields.map((field, index) => {
-              return (
+              return field?.hidden ? (
+                <></>
+              ) : (
                 <div
                   key={`${field.name}-${index}`}
                   className="col-auto col-lg-12"
@@ -98,14 +100,14 @@ const GenericForm = ({
                   </label>
                   {createFormField(field)}
                   {errors[field.name] && (
-                    <p className="alert alert-danger" role="alert">
+                    <p className="alert alert-danger mt-2" role="alert">
                       {errors[field.name]?.message?.toString()}
                     </p>
                   )}
                 </div>
               );
             })}
-            <div className="col-auto col-lg-12 mt-3 d-flex justify-content-end">
+            <div className="col-auto col-12 mt-3 d-flex justify-content-end">
               <button
                 type="submit"
                 className="btn btn-primary mb-3"

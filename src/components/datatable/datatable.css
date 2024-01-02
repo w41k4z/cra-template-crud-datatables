@@ -6,6 +6,11 @@
     height: fit-content;
 }
 
+.datatable {
+    border: 1px outset transparent;
+    border-radius: 10px;
+}
+
 .datatable-bottom {
     display: flex;
     justify-content: space-between;

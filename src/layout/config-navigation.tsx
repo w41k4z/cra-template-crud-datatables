@@ -15,8 +15,8 @@ export const navConfig: NavElement[] = [
     title: "Department",
     elements: [
       {
-        title: "Test",
-        path: "/test",
+        title: "Example",
+        path: "/example",
         icon: <FlatColor.FcSettings />,
         onItemClick: () => {},
       },

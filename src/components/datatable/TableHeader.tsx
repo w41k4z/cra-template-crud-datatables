@@ -88,7 +88,7 @@ const TableHeader = ({
                   </div>
                 </>
               )}
-              {column.format === "number" && (
+              {(column.format === "number" || column.format === "currency") && (
                 <div className="d-flex">
                   <div style={filterContainerStyle}>
                     <BsFilter

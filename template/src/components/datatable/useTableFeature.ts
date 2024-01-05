@@ -7,10 +7,14 @@ import moment from "moment";
 type TableFeatureProps = {
   tableTitle?: string;
   columns: Column[];
-  data: any[];
+  displayedData: any[];
 };
 
-const useTableFeature = ({ tableTitle, columns, data }: TableFeatureProps) => {
+const useTableFeature = ({
+  tableTitle,
+  columns,
+  displayedData,
+}: TableFeatureProps) => {
   const [addModalVisibility, setAddModalVisibility] = useState(false);
   const [importModalVisibility, setImportModalVisibility] = useState(false);
   const [uploadingFile, setUploadingFile] = useState<File>();
@@ -33,7 +37,7 @@ const useTableFeature = ({ tableTitle, columns, data }: TableFeatureProps) => {
     const docTitle = tableTitle ? tableTitle : "Report";
     const headers = [columns.map((column) => column.name)];
 
-    const dataToExport = data.map((item) =>
+    const dataToExport = displayedData.map((item) =>
       columns.map((column) =>
         column.format === "date"
           ? moment(item[column.propTarget]).format("DD/MM/YYYY")

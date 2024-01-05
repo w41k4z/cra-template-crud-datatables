@@ -1,0 +1,23 @@
+.side-panel {
+    width: 20%;
+    min-height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 15px 0 5px 15px;
+    background-color: #212529;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.main-content {
+    width: 80%;
+}
+
+@media only screen and (max-width: 767px) {
+    .side-panel {
+        width: fit-content;
+    }
+
+    .main-content {
+        width: 88%;
+    }
+}

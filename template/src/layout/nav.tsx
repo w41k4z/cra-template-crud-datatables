@@ -3,7 +3,7 @@ import { HTMLProps, ReactNode, useState } from "react";
 import { navConfig } from "./config-navigation";
 import { Link } from "react-router-dom";
 
-import "../assets/css/nav.css";
+import "./nav.css";
 
 type NavProps = HTMLProps<HTMLElement> & {
   header: ReactNode;

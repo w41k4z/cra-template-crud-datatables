@@ -27,6 +27,7 @@ const GenericForm = ({
     name,
     options,
     selectValues,
+    selectOnChangeEvent,
     ...props
   }: FormField) => {
     switch (type) {
@@ -44,6 +45,7 @@ const GenericForm = ({
           <select
             className={`form-control ${className}`}
             {...register(name, options)}
+            onChange={selectOnChangeEvent}
           >
             {selectValues?.map((option, index) => (
               <option key={`${name}-option-${index}`} value={option.at(0)}>

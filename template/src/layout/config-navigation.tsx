@@ -1,4 +1,11 @@
-import * as FlatColor from "react-icons/fc";
+import {
+  RxActivityLog,
+  RxBorderWidth,
+  RxClock,
+  RxColumns,
+  RxDashboard,
+  RxPaperPlane,
+} from "react-icons/rx";
 
 export type NavElement = {
   title: string;
@@ -12,12 +19,48 @@ export type NavElement = {
 
 export const navConfig: NavElement[] = [
   {
-    title: "Department",
+    title: "Table",
     elements: [
       {
-        title: "Example",
-        path: "/example",
-        icon: <FlatColor.FcSettings />,
+        title: "Activité",
+        path: "/activité",
+        icon: <RxActivityLog />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Bouquet",
+        path: "/bouquet",
+        icon: <RxDashboard />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Activité de bouquet",
+        path: "/activités-bouquet",
+        icon: <RxDashboard />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Durée",
+        path: "/durée",
+        icon: <RxClock />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Catégorie",
+        path: "/catégorie",
+        icon: <RxColumns />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Voyage",
+        path: "/voyage",
+        icon: <RxPaperPlane />,
+        onItemClick: () => {},
+      },
+      {
+        title: "Activité de voyage",
+        path: "/activités-voyage",
+        icon: <RxBorderWidth />,
         onItemClick: () => {},
       },
     ],

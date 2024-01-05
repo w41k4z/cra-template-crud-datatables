@@ -41,6 +41,7 @@ const GenericTable = ({
 }: GenericTableProps) => {
   const {
     navigate,
+    filteredData,
     setFilteredData,
     setItemsPerPageValue,
     filters,
@@ -62,7 +63,8 @@ const GenericTable = ({
         <TableFeature
           columns={columns}
           setData={setFilteredData}
-          data={paginatedData}
+          data={filteredData}
+          displayedData={paginatedData}
           tableTitle={title}
           setItemsPerPageValue={setItemsPerPageValue}
           hasAddAction={hasAction?.addAction}

@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { Outlet, Navigate, useRoutes } from "react-router-dom";
-import Layout from "./Layout";
+import Layout from "./layout/Layout";
 
 export const Page404 = lazy(() => import("./pages/Page404"));
 export const ExamplePage = lazy(() => import("./pages/Example"));

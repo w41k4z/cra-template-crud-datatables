@@ -57,6 +57,7 @@ function useDatatable({
   return {
     navigate,
     setItemsPerPageValue,
+    filteredData,
     setFilteredData,
     filters,
     setFilters,

@@ -20,6 +20,7 @@ export type TableFeatureType = {
 type TableFeatureProps = {
   columns: Column[];
   data: any[];
+  displayedData: any[];
   tableTitle?: string;
   setData: (data: any[]) => void;
   setItemsPerPageValue: (value: string) => void;
@@ -32,6 +33,7 @@ const TableFeature = ({
   columns,
   setData,
   data,
+  displayedData,
   tableTitle,
   setItemsPerPageValue,
   hasAddAction,
@@ -40,9 +42,9 @@ const TableFeature = ({
 }: TableFeatureProps) => {
   const { addModalVisibility, showAddModal, hideAddModal, exportPDF } =
     useTableFeature({
-      columns,
-      data,
       tableTitle,
+      columns,
+      displayedData,
     });
 
   return (
@@ -88,11 +90,12 @@ const TableFeature = ({
                 fields={hasAddAction.fields}
                 title={hasAddAction.formTitle}
                 onSubmit={(insertedData) => {
-                  const newData = [...data];
-                  newData.push(insertedData);
-                  setData(newData);
-                  hideAddModal();
-                  return hasAddAction.onSubmit(insertedData);
+                  return hasAddAction.onSubmit(insertedData).then(() => {
+                    const newData = [...data];
+                    newData.push(insertedData);
+                    setData(newData);
+                    hideAddModal();
+                  });
                 }}
               />
             </Modal.Body>

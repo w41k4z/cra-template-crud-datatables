@@ -13,4 +13,5 @@ export type FormField = Omit<
   label?: string;
   options?: RegisterOptions<FieldValues, string> | undefined; // For react-hook-form
   selectValues?: [string, string][]; // For select input only, array of [value, label]
+  selectOnChangeEvent?: (e: React.ChangeEvent<HTMLSelectElement>) => void; // For select input only
 };

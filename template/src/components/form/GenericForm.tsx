@@ -90,20 +90,18 @@ const GenericForm = ({
             className="row g-3 px-3 pt-3"
           >
             {fields.map((field, index) => {
+              const { name, label, options, ...rest } = field;
               return field?.hidden ? (
-                <></>
+                <input {...rest} {...register(name, options)} />
               ) : (
-                <div
-                  key={`${field.name}-${index}`}
-                  className="col-auto col-lg-12"
-                >
-                  <label className="form-label" htmlFor={field.name}>
-                    {field.label}
+                <div key={`${name}-${index}`} className="col-auto col-lg-12">
+                  <label className="form-label" htmlFor={name}>
+                    {label}
                   </label>
                   {createFormField(field)}
-                  {errors[field.name] && (
+                  {errors[name] && (
                     <p className="alert alert-danger mt-2" role="alert">
-                      {errors[field.name]?.message?.toString()}
+                      {errors[name]?.message?.toString()}
                     </p>
                   )}
                 </div>

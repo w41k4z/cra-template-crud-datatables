@@ -20,7 +20,7 @@ export function filterData(
   for (const item of data) {
     let flag = true;
     for (const column of columns) {
-      if (column.format === "number") {
+      if (column.format === "number" || column.format === "currency") {
         let lowerValue: number = filters[column.propTarget][0]
           ? parseFloat(filters[column.propTarget][0])
           : Number.MAX_VALUE / -1;
